@@ -546,3 +546,27 @@ def test_themes_all_apply_correctly():
     for key in THEMES:
         _apply_theme(key)
         assert m._A2 == THEMES[key]["A2"], f"theme {key} A2 mismatch"
+
+
+# ── LLM Options ───────────────────────────────────────────────────────────────
+
+def test_llm_payload_includes_temperature(monkeypatch):
+    import foder.config as c
+    import foder.llm as llm
+    captured_payload = {}
+
+    def mock_post(url, json=None, timeout=None):
+        nonlocal captured_payload
+        captured_payload = json
+        class MockResp:
+            status_code = 200
+            def raise_for_status(self): pass
+            def json(self): return {"message": {"content": "ok"}}
+        return MockResp()
+
+    monkeypatch.setattr("foder.llm.httpx.post", mock_post)
+    res = llm.chat([{"role": "user", "content": "hi"}])
+    assert res == "ok"
+    assert "options" in captured_payload
+    assert captured_payload["options"]["temperature"] == c.LLM_TEMPERATURE
+

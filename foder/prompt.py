@@ -50,11 +50,11 @@ WORKSPACE: {workspace}
 CORE RULES:
 - When asked to create, write, or implement a program → emit file_write with COMPLETE working code immediately
 - When the user asks to create or write code, only emit file_write. Do NOT execute speculative shell commands unless the user explicitly requested running or testing the code.
+- When asked to modify, edit, or update an existing file → emit file_edit (with path, old_str, new_str)
 - To inspect or list workspace files → emit dir_list
 - To read an existing file → emit file_read
-- To modify part of an existing file → emit file_read first, then file_edit (not file_write)
 - To run or test code → emit shell_exec (e.g. python3 <filename> or java <filename>.java)
-- To verify code syntax → emit code_verify (or note that file_write and file_edit verify syntax automatically)
+- Note that file_write and file_edit automatically verify code syntax upon execution
 - To delete a file → emit file_delete with path and confirm=true
 - To search code → emit grep_search
 - To perform git operations → emit git_tool
@@ -74,11 +74,14 @@ EXAMPLES:
 1. Inspect workspace files:
 {{"tool": "dir_list", "parameters": {{"path": "."}}}}
 
-2. Create calculator.py:
-{{"tool": "file_write", "parameters": {{"path": "calculator.py", "content": "def add(a, b):\\n    return a + b\\n\\ndef subtract(a, b):\\n    return a - b\\n\\ndef multiply(a, b):\\n    return a * b\\n\\ndef divide(a, b):\\n    if b == 0:\\n        raise ValueError('Cannot divide by zero')\\n    return a / b\\n\\nif __name__ == '__main__':\\n    print('4 + 2 =', add(4, 2))\\n"}}}}
+2. Create a script:
+{{"tool": "file_write", "parameters": {{"path": "math_utils.py", "content": "def add(a, b):\\n    return a + b\\n\\ndef multiply(a, b):\\n    return a * b\\n\\nif __name__ == '__main__':\\n    print('Result:', add(2, 3))\\n"}}}}
 
 3. Execute and test program:
-{{"tool": "shell_exec", "parameters": {{"command": "python3 calculator.py"}}}}
+{{"tool": "shell_exec", "parameters": {{"command": "python3 math_utils.py"}}}}
+
+4. Modify existing file:
+{{"tool": "file_edit", "parameters": {{"path": "math_utils.py", "old_str": "def multiply(a, b):\\n    return a * b", "new_str": "def multiply(a, b):\\n    return a * b\\n\\ndef power(a, b):\\n    return a ** b"}}}}
 
 {custom_instructions}
 AVAILABLE TOOLS:

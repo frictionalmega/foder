@@ -654,6 +654,10 @@ def run(
             history.append({"role": "assistant", "content": turn_content})
             history.append({"role": "user",      "content": tool_turn})
 
+            if is_error:
+                # Stop executing subsequent tools from this turn so the model can fix this failure first
+                break
+
         if not executed_any:
             # No tool was executed (e.g. all were loop-detected) — avoid infinite loop
             clean = _strip_tool_json(raw)
@@ -678,6 +682,14 @@ def run(
             edits = [p.get("path") for t, p, r in executed_tools_all if t == "file_edit" and p.get("path")]
             if edits and not wants_run and any(w in user_lower for w in ("edit", "modify", "update", "change", "refactor", "patch", "fix")):
                 confirm_msg = f"Updated {', '.join(edits)} and verified syntax successfully."
+                history.append({"role": "assistant", "content": confirm_msg})
+                return _stream_tokens([confirm_msg]), history
+
+            shells = [(p.get("command"), r) for t, p, r in executed_tools_all if t == "shell_exec" and p.get("command")]
+            wants_write_or_edit = any(w in user_lower for w in ("create", "write", "make", "generate", "edit", "modify", "update", "refactor", "patch", "fix"))
+            if shells and not last_is_error and not wants_write_or_edit and any(w in user_lower for w in ("run", "test", "exec", "execute")):
+                last_cmd, last_res = shells[-1]
+                confirm_msg = f"Executed `{last_cmd}` successfully.\n{last_res}".strip()
                 history.append({"role": "assistant", "content": confirm_msg})
                 return _stream_tokens([confirm_msg]), history
 

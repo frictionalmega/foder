@@ -227,3 +227,43 @@ def test_truncate_long_result_shortened():
     t = _truncate_tool_result(long_r)
     assert len(t) < 2000
     assert "truncated" in t
+
+
+def test_multi_tool_stops_on_first_error(monkeypatch, tmp_path):
+    import foder.config as config
+    from foder.agent import run
+    monkeypatch.setattr(config, "WORKSPACE", tmp_path)
+
+    # First turn emits two tools: file_write with syntax error, and shell_exec
+    # Second turn emits final answer
+    calls = []
+    responses = [
+        '{"tool": "file_write", "parameters": {"path": "bad.py", "content": "def broken(:"}}\n'
+        '{"tool": "shell_exec", "parameters": {"command": "python3 bad.py"}}',
+        'Fixed the issue.',
+    ]
+
+    def mock_chat_stream(messages):
+        calls.append(messages)
+        yield responses.pop(0)
+
+    monkeypatch.setattr("foder.agent.chat_stream", mock_chat_stream)
+
+    executed_tools = []
+    def mock_dispatch(name, params):
+        executed_tools.append((name, params))
+        if name == "file_write":
+            return "[error] Syntax verification failed"
+        return "[ok]"
+
+    monkeypatch.setattr("foder.agent.dispatch", mock_dispatch)
+
+    history = []
+    gen, history = run("create and run bad.py", history)
+    list(gen)
+
+    # file_write was executed, but shell_exec was NOT executed because file_write errored!
+    assert len(executed_tools) == 1
+    assert executed_tools[0][0] == "file_write"
+    assert "shell_exec" not in [t[0] for t in executed_tools]
+

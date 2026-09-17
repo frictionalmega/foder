@@ -52,6 +52,11 @@ def chat(messages: list[dict]) -> str:
         "model": config.OLLAMA_MODEL,
         "messages": messages,
         "stream": False,
+        "keep_alive": "10m",
+        "options": {
+            "temperature": config.LLM_TEMPERATURE,
+            "top_p": 0.9,
+        },
     }
     try:
         response = httpx.post(
@@ -110,6 +115,10 @@ def chat_stream(messages: list[dict]) -> Iterator[str]:
         "messages": messages,
         "stream": True,
         "keep_alive": "10m",
+        "options": {
+            "temperature": config.LLM_TEMPERATURE,
+            "top_p": 0.9,
+        },
     }
 
     # Hard wall-clock deadline for the entire stream

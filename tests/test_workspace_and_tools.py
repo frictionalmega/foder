@@ -482,3 +482,31 @@ def test_prompt_compact_tool_signatures():
     assert "- file_read(path: string" in sig_block
     assert "- shell_exec(command: string):" in sig_block
 
+
+def test_agent_run_shell_exec_fast_confirmation():
+    """
+    Test that shell_exec fast-path confirmation immediately returns the output
+    when the user specifically asked to run/test something and the command succeeded.
+    """
+    from unittest.mock import patch
+    orig_ws = config.WORKSPACE
+    with tempfile.TemporaryDirectory() as d:
+        config.WORKSPACE = Path(d)
+        (Path(d) / "calc.py").write_text("print('4 + 2 = 6')\n")
+
+        turns = [
+            iter(['{"tool": "shell_exec", "parameters": {"command": "python3 calc.py"}}']),
+        ]
+        def fake_chat_stream(msgs):
+            if turns:
+                return turns.pop(0)
+            return iter([""])
+
+        with patch("foder.agent.chat_stream", side_effect=fake_chat_stream):
+            token_gen, hist = run("run calc.py to test the arithmetic functions", [])
+            output = "".join(list(token_gen))
+            assert "Executed `python3 calc.py` successfully." in output
+            assert "4 + 2 = 6" in output
+
+    config.WORKSPACE = orig_ws
+

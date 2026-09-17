@@ -521,7 +521,7 @@ foder/
 ├── README.md
 ├── CHANGELOG.md
 ├── DESIGN.md
-└── TRY_THIS.md
+└── DEMO_PROMPTS.md
 ```
 
 ---

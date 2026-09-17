@@ -156,7 +156,8 @@ def execute(path: str, old_str: str, new_str: str) -> str:
                         break
             return (
                 f"[error] old_str not found in {path} (tried exact and whitespace-normalized match)."
-                f"{context_hint}"
+                f"{context_hint}\n"
+                f"Tip: emit file_read to inspect the exact lines of {path} before retrying file_edit."
             )
 
         start, end    = bounds

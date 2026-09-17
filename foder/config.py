@@ -55,6 +55,7 @@ def _detect_default_model() -> str:
 MAX_ITERATIONS: int  = int(os.environ.get("FODER_MAX_ITER", "20"))
 SHELL_TIMEOUT: int   = int(os.environ.get("FODER_SHELL_TIMEOUT", "30"))
 LLM_TIMEOUT: float   = float(os.environ.get("FODER_LLM_TIMEOUT", "600"))
+LLM_TEMPERATURE: float = float(os.environ.get("FODER_LLM_TEMPERATURE", "0.1"))
 
 # ── Custom instructions ───────────────────────────────────────────────────────
 
