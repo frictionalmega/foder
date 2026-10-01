@@ -1,5 +1,10 @@
 # Foder
 
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![Ollama](https://img.shields.io/badge/Ollama-Powered-green)](https://ollama.com)
+[![Tests](https://img.shields.io/badge/Tests-51%20passing-brightgreen)](https://github.com/Frictionalfor/foder/actions)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey)](/LICENSE)
+
 **Local AI Coding Agent — powered entirely by Ollama. No cloud. No API keys. Just code.**
 
 ```
@@ -449,7 +454,11 @@ OLLAMA_MODEL=qwen3.5:9b python3 tests/test_agent_logic.py
 python3 tests/test_integration.py
 ```
 
----
+## Continuous Integration
+
+[![Tests](https://github.com/Frictionalfor/foder/actions/workflows/tests.yml/badge.svg)](https://github.com/Frictionalfor/foder/actions)
+
+Every push runs the unit test suite on Python 3.11 and 3.13.
 
 ## License
 
