@@ -25,8 +25,5 @@ jobs:
           pip install pytest pytest-asyncio
           pip install -e .
 
-      - name: Run unit tests
-        run: pytest tests/test_unit.py -v
-
-      - name: Run agent logic tests
-        run: pytest tests/test_agent_logic.py -v
+      - name: Run tests
+        run: pytest tests/ -v
