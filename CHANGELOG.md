@@ -6,9 +6,12 @@
 
 ### Added
 
-- Final release preparation - push all changes including CHANGELOG (733d2ee)
 - Auto-generate Unreleased block via scripts/update_changelog.py (79f0d93)
 - Auto-update CHANGELOG.md on commit via hook, improve error messages, fix update stash and release scripts (e126f85)
+
+### Other
+
+- Revert README to match target branch (Frictionalfor/foder old identity) (c463ab6)
 
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
 <!-- auto:generated=2026-10-13 · regenerate: python3 scripts/update_changelog.py -->
