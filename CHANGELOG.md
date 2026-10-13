@@ -13,7 +13,7 @@
 
 ### Documentation
 
-- Update author and repository references to frictionalmega (4d1ba71)
+- Update author and repository references to frictionalmega (3f6606e)
 
 ### Chores
 
