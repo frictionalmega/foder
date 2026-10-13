@@ -479,3 +479,37 @@ MIT — see [LICENSE](LICENSE)
 | Install | [foder.vercel.app/install.sh](https://foder.vercel.app/install.sh)                       |
 | Issues  | [github.com/frictionalmega/foder/issues](https://github.com/frictionalmega/foder/issues) |
 | Author  | [Swanand Gajkeshwar](https://github.com/frictionalmega)                                  |
+
+## Installation Packages
+
+Pre-built installers are available in the [dist](./dist) directory for each release:
+
+- **Windows**: `foder-0.1.0.exe` (placeholder; actual binary generated via CI)
+- **Linux/macOS**: `./installer-packages/linux/install.sh`
+- **Debian/Ubuntu**: `foder_0.1.0_all.deb` (placeholder; actual package generated via CI)
+
+### Usage
+
+#### Windows
+
+Run the installer:
+
+```batch
+foder-0.1.0.exe
+```
+
+#### Linux/macOS
+
+Run the shell script:
+
+```bash
+./installer-packages/linux/install.sh
+```
+
+#### Debian/Ubuntu
+
+Install the Debian package:
+
+```bash
+sudo dpkg -i foder_0.1.0_all.deb
+```

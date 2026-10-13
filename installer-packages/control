@@ -1,0 +1,9 @@
+Package: foder
+Version: 0.1.0
+Section: base
+Priority: optional
+Architecture: all
+Maintainer: Frictional <frictional75@gmail.com>
+Description: Foder - Local AI Coding Agent powered by Ollama
+ Foder is a terminal-based AI coding agent that runs 100% locally using Ollama.
+ It provides project generation, interactive REPL, and 11 built-in skills.
