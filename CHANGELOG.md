@@ -9,6 +9,10 @@
 - Auto-generate Unreleased block via scripts/update_changelog.py (79f0d93)
 - Auto-update CHANGELOG.md on commit via hook, improve error messages, fix update stash and release scripts (e126f85)
 
+### Chores
+
+- Auto-update CHANGELOG.md (83c985f)
+
 ### Other
 
 - Revert README to match target branch (Frictionalfor/foder old identity) (c463ab6)
