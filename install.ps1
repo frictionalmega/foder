@@ -169,7 +169,7 @@ Write-Host ""
 Write-Info "Installing foder..."
 
 $installed = $false
-foreach ($flags in @("-q", "--user -q", "--user", "--break-system-packages -q")) {
+foreach ($flags in @("-q", "--user -q", "--user")) {
     try {
         & $Python -m pip install -e . $flags.Split(' ') 2>$null
         if ($LASTEXITCODE -eq 0) { $installed = $true; break }
