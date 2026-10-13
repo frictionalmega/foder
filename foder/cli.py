@@ -6,22 +6,20 @@ CLI system for Foder — handles lifecycle flags.
   foder --uninstall       → remove foder, keep user projects and Ollama
 
 All operations respect the local-first philosophy:
-- Updates pull from https://github.com/Frictionalfor/foder only
+- Updates pull from https://github.com/frictionalmega/foder only
 - Install/uninstall never touches Ollama or user projects
 - User data (~/.foder/) is preserved across updates
 """
 
 import sys
-import os
 import subprocess
 import shutil
 from pathlib import Path
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
-from rich.rule import Rule
-from rich import box
+
+from foder import __version__ as _VERSION
 
 console = Console(highlight=False)
 
@@ -32,7 +30,8 @@ _YLW  = "#F59E0B"
 _RED  = "#fca5a5"
 _BLD  = "bold"
 
-GITHUB_REPO = "https://github.com/Frictionalfor/foder"
+GITHUB_REPO = "https://github.com/frictionalmega/foder"
+RAW_REPO    = "https://raw.githubusercontent.com/frictionalmega/foder/main"
 
 
 # ── Help ──────────────────────────────────────────────────────────────────────
@@ -49,7 +48,7 @@ def show_help() -> None:
         ),
         border_style="#166534", padding=(0, 1),
         title=f"[{_DIM}]local AI coding agent[/{_DIM}]",
-        subtitle=f"[{_DIM}]v0.2.0 · no cloud · no keys · just code[/{_DIM}]",
+        subtitle=f"[{_DIM}]v{_VERSION} · no cloud · no keys · just code[/{_DIM}]",
     ))
 
     # Usage
@@ -181,6 +180,7 @@ def show_help() -> None:
         ("GitHub",        GITHUB_REPO),
         ("Website",       "https://foder.vercel.app"),
         ("Install",       "https://foder.vercel.app/install.sh"),
+        ("Install (repo)", f"{RAW_REPO}/install.sh"),
         ("Issues",        f"{GITHUB_REPO}/issues"),
     ])
     console.print()
@@ -281,12 +281,26 @@ def _restore_user_data(backup_dir: Path, user_dir: Path) -> None:
 def _update_via_git(repo_dir: Path, backup_dir: Path) -> None:
     console.print(f"  [{_DIM}]→ pulling latest commits from GitHub...[/{_DIM}]")
 
-    # Stash any local changes so pull doesn't fail
-    _run(["git", "stash"], cwd=repo_dir, silent=True)
+    # Ask git which branch the clone is actually on — hardcoding "main" silently
+    # pulls the wrong ref for anyone using a different branch.
+    branch = _current_branch(repo_dir)
 
-    ok = _run(["git", "pull", "--rebase", "origin", "main"], cwd=repo_dir)
+    # Stash local changes so the pull cannot fail, but never abandon them.
+    stashed = _stash_local_changes(repo_dir)
+
+    ok = bool(branch) and _run(["git", "pull", "--rebase", "origin", branch],
+                               cwd=repo_dir)
+    if not ok and branch:
+        ok = _run(["git", "pull", "origin", branch], cwd=repo_dir)
     if not ok:
-        ok = _run(["git", "pull", "origin", "main"], cwd=repo_dir)
+        ok = _run(["git", "pull", "--rebase"], cwd=repo_dir)
+
+    if stashed:
+        if ok:
+            _restore_stash(repo_dir)
+        else:
+            # Roll the stash back on so nothing is stranded in the stash.
+            _restore_stash(repo_dir)
 
     if not ok:
         console.print(f"  [{_RED}]✗  git pull failed. Rolling back.[/{_RED}]")
@@ -303,6 +317,7 @@ def _update_via_git(repo_dir: Path, backup_dir: Path) -> None:
                       cwd=repo_dir)
 
     _restore_user_data(backup_dir, Path.home() / ".foder")
+    _cleanup_backup(backup_dir)
 
     if pip_ok:
         console.print()
@@ -311,6 +326,65 @@ def _update_via_git(repo_dir: Path, backup_dir: Path) -> None:
     else:
         console.print(f"  [{_RED}]✗  pip reinstall failed — foder may be broken. Run: pip install -e .[/{_RED}]")
     console.print()
+
+
+def _current_branch(repo_dir: Path) -> str:
+    """Return the checked-out branch name, or "" if detached/unknown."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=str(repo_dir), capture_output=True, text=True, timeout=30,
+        )
+    except Exception:
+        return ""
+    name = (result.stdout or "").strip()
+    return "" if name in ("", "HEAD") else name
+
+
+def _stash_local_changes(repo_dir: Path) -> bool:
+    """stash only when there is something to stash. Returns True if a stash was made."""
+    try:
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=str(repo_dir), capture_output=True, text=True, timeout=30,
+        )
+        if status.returncode != 0 or not (status.stdout or "").strip():
+            return False
+        stash = subprocess.run(
+            ["git", "stash", "push", "-m", "foder-update-autostash"],
+            cwd=str(repo_dir), capture_output=True, text=True, timeout=60,
+        )
+        return stash.returncode == 0
+    except Exception:
+        return False
+
+
+def _restore_stash(repo_dir: Path) -> None:
+    """Pop the update autostash. Warns loudly instead of silently stranding work."""
+    try:
+        result = subprocess.run(
+            ["git", "stash", "pop"],
+            cwd=str(repo_dir), capture_output=True, text=True, timeout=60,
+        )
+    except Exception as e:
+        console.print(f"  [{_YLW}]![/{_YLW}]  Could not restore local changes: {e}")
+        console.print(f"  [{_DIM}]  Run: git -C {repo_dir} stash pop[/{_DIM}]")
+        return
+    if result.returncode != 0:
+        console.print(f"  [{_YLW}]![/{_YLW}]  Local changes left in the stash (pull conflicted).")
+        console.print(f"  [{_DIM}]  Inspect: git -C {repo_dir} stash show -p[/{_DIM}]")
+        console.print(f"  [{_DIM}]  Restore: git -C {repo_dir} stash pop[/{_DIM}]")
+    else:
+        console.print(f"  [{_GRN}]✓[/{_GRN}]  Local changes restored")
+
+
+def _cleanup_backup(backup_dir: Path) -> None:
+    """Remove the update backup once user data has been restored."""
+    try:
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+    except Exception:
+        pass
 
 
 def _update_via_pip(backup_dir: Path) -> None:
@@ -328,6 +402,7 @@ def _update_via_pip(backup_dir: Path) -> None:
         ])
 
     _restore_user_data(backup_dir, Path.home() / ".foder")
+    _cleanup_backup(backup_dir)
 
     if ok:
         console.print(f"  [{_GRN}]✓  Update complete![/{_GRN}]")
@@ -346,8 +421,10 @@ def do_uninstall() -> None:
         f"[bold {_YLW}]Foder Uninstall[/bold {_YLW}]\n\n"
         f"[{_DIM}]This will remove:[/{_DIM}]\n"
         f"  • foder CLI binary\n"
-        f"  • foder Python package\n"
-        f"  • ~/.foder/ config and cache directory\n\n"
+        f"  • foder Python package\n\n"
+        f"[{_DIM}]You will be asked whether to keep ~/.foder/[/{_DIM}]\n"
+        f"[{_DIM}](memory, preferences, history). The default is[/{_DIM}]\n"
+        f"[{_DIM}]to keep it.[/{_DIM}]\n\n"
         f"[{_DIM}]This will NOT remove:[/{_DIM}]\n"
         f"  • Ollama\n"
         f"  • Your projects\n"

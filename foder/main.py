@@ -20,6 +20,7 @@ from foder.agent import run, plan as agent_plan, AgentCallbacks
 from foder.llm import list_models, unload_model, LLMError, get_token_stats
 from foder.security import validate_command, SecurityError
 from foder.commands import COMMANDS as _COMMANDS, get_model_hint
+from foder import __version__ as _VERSION
 
 console = Console(highlight=False)
 
@@ -200,7 +201,7 @@ def _print_banner() -> None:
         Columns([_logo(), meta], padding=(0, 6), equal=False),
         border_style=_A4, padding=(0, 1),
         title=f"[{_A3}] ◆ foder [/{_A3}]", title_align="left",
-        subtitle=f"[{_DIM}]v0.2.0 · local AI agent · Ollama-powered · 100% offline[/{_DIM}]",
+        subtitle=f"[{_DIM}]v{_VERSION} · local AI agent · Ollama-powered · 100% offline[/{_DIM}]",
         subtitle_align="right",
     ))
     console.print()

@@ -29,6 +29,27 @@ _session_prompt_tokens:   int = 0   # cumulative for the session
 _session_response_tokens: int = 0   # cumulative for the session
 
 
+def _model_missing_message(model: str) -> str:
+    """Actionable message for Ollama's 'model not found' response."""
+    return (
+        f"Model '{model}' is not installed in Ollama.\n"
+        f"  Pull it:   ollama pull {model}\n"
+        f"  Or pick:   foder --help  then  /models  and  /switch <model>"
+    )
+
+
+def _http_error_message(e: httpx.HTTPStatusError, model: str) -> str:
+    """Turn an Ollama HTTP error into a message a user can act on."""
+    body = ""
+    try:
+        body = (e.response.text or "")[:300]
+    except Exception:
+        pass
+    if e.response.status_code == 404 or "not found" in body.lower():
+        return _model_missing_message(model)
+    return f"Ollama returned HTTP {e.response.status_code}: {body}"
+
+
 def list_models() -> list[str]:
     """Query Ollama for all locally available models."""
     try:
@@ -40,7 +61,7 @@ def list_models() -> list[str]:
             "Is Ollama running? Try: ollama serve"
         )
     except httpx.HTTPStatusError as e:
-        raise LLMError(f"Ollama returned HTTP {e.response.status_code}: {e.response.text}")
+        raise LLMError(_http_error_message(e, config.OLLAMA_MODEL))
 
     models = response.json().get("models", [])
     return [m["name"] for m in models]
@@ -73,7 +94,7 @@ def chat(messages: list[dict]) -> str:
             "Is Ollama running? Try: ollama serve"
         )
     except httpx.HTTPStatusError as e:
-        raise LLMError(f"Ollama returned HTTP {e.response.status_code}: {e.response.text}")
+        raise LLMError(_http_error_message(e, config.OLLAMA_MODEL))
     except httpx.TimeoutException:
         raise LLMError("Request to Ollama timed out.")
 
@@ -90,12 +111,14 @@ def chat_stream(messages: list[dict]) -> Iterator[str]:
     Yields string chunks. Raises LLMError on connection/HTTP failure.
 
     Timeout strategy (fixes hang-forever bug):
-    - connect_timeout: 10s  — fail fast if Ollama isn't running
-    - read_timeout:    per-token idle limit (LLM_TIMEOUT / 4, min 30s)
-                       if Ollama stops sending tokens mid-response, we bail
-    - pool_timeout:    10s  — connection pool wait
+    - connect_timeout: 15s  — fail fast if Ollama isn't running
+    - read_timeout:    per-token idle limit, max(300s, LLM_TIMEOUT)
+                        if Ollama stops sending tokens mid-response, we bail
+    - pool_timeout:    15s  — connection pool wait
     The read timeout resets with each received token, so slow-but-alive
     models are fine. Only truly stalled streams are killed.
+    A hard wall-clock deadline of LLM_TIMEOUT also caps the whole stream,
+    so a model that trickles tokens forever is still stopped.
     """
     import json as _json
     import time
@@ -167,7 +190,7 @@ def chat_stream(messages: list[dict]) -> Iterator[str]:
             "Is Ollama running? Try: ollama serve"
         )
     except httpx.HTTPStatusError as e:
-        raise LLMError(f"Ollama returned HTTP {e.response.status_code}: {e.response.text}")
+        raise LLMError(_http_error_message(e, config.OLLAMA_MODEL))
     except httpx.TimeoutException:
         raise LLMError(
             f"Ollama stopped responding (idle > {per_token_timeout:.0f}s). "

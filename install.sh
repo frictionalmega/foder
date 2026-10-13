@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Foder — Official Installer
-# Source: https://foder.vercel.app/install.sh
+# Repository: https://github.com/frictionalmega/foder
 #
-# One-line install (OFFICIAL):
+# One-line install:
 #   curl -fsSL https://foder.vercel.app/install.sh | bash
 #
 set -euo pipefail
 
-FODER_REPO="https://github.com/Frictionalfor/foder"
+FODER_REPO="https://github.com/frictionalmega/foder"
 FODER_SITE="https://foder.vercel.app"
-FODER_VERSION="0.2.0"
+FODER_VERSION="0.1.0"
 
 # ── Colors ─────────────────────────────────────────────────────────────────────
 if [ -t 1 ]; then
@@ -39,17 +39,44 @@ sep
 echo ""
 
 # ── Security: source verification ─────────────────────────────────────────────
-# This script may only be run from the official source or local repo.
-# No third-party mirrors. No GitHub cloning for install.
+# Foder source is fetched only from the official sources below:
+#   install script: https://foder.vercel.app/install.sh
+#   repository:     https://github.com/frictionalmega/foder
+# No third-party mirrors are used.
+
+# ── Prompt safely when run as `curl ... | bash` ───────────────────────────────
+# When the script is piped on stdin, `read` would swallow the rest of the
+# script instead of waiting for the user. Re-attach stdin to the terminal.
+PROMPTS_OFF=0
+if [ ! -t 0 ] && [ -w /dev/tty ]; then
+  if exec < /dev/tty 2>/dev/null; then :; else PROMPTS_OFF=1; fi
+fi
+if [ ! -t 0 ] || [ ! -r /dev/tty ]; then
+  PROMPTS_OFF=1
+fi
+
+ask_yn() {
+  # ask_yn <prompt> <default: y|n>  →  returns 0 for yes, 1 for no.
+  local prompt="$1" default="${2:-y}"
+  if [ "$PROMPTS_OFF" = "1" ]; then
+    echo ""
+    echo "  (no terminal available — assuming '$default')"
+    warn "Re-run interactively to confirm: $prompt"
+    [ "$default" = "y" ] && return 0 || return 1
+  fi
+  local reply=""
+  read -rp "$prompt" reply || reply="$default"
+  reply="${reply:-$default}"
+  reply="$(printf '%s' "$reply" | tr '[:upper:]' '[:lower:]')"
+  case "$reply" in
+    y|yes) return 0 ;;
+    *)     return 1 ;;
+  esac
+}
 
 # ── Detect OS ──────────────────────────────────────────────────────────────────
 OS="$(uname -s 2>/dev/null || echo unknown)"
 ARCH="$(uname -m 2>/dev/null || echo unknown)"
-case "$OS" in
-  Linux*)  PLATFORM="linux"  ;;
-  Darwin*) PLATFORM="macos"  ;;
-  *)       PLATFORM="unknown" ;;
-esac
 info "Platform: $OS ($ARCH)"
 
 # ── Check Python 3.10+ ─────────────────────────────────────────────────────────
@@ -91,36 +118,87 @@ else
   echo "  Foder requires Ollama to run local LLMs."
   echo -e "  Install: ${CYN}https://ollama.com${RST}"
   echo ""
-  read -rp "  Continue without Ollama? [y/N] " REPLY; echo ""
-  [[ "$REPLY" =~ ^[Yy]$ ]] || { echo "  Install Ollama first, then re-run."; exit 1; }
+  if ! ask_yn "  Continue without Ollama? [y/N] " "n"; then
+    echo "  Install Ollama first, then re-run."
+    exit 1
+  fi
 fi
 
 # ── Get foder source ───────────────────────────────────────────────────────────
-# OFFICIAL SOURCE ONLY: https://foder.vercel.app
-# Update source: https://github.com/Frictionalfor/foder
+# Official sources:
+#   installer: https://foder.vercel.app/install.sh
+#   repository: https://github.com/frictionalmega/foder
 INSTALL_DIR=""
 
 if [ -f "pyproject.toml" ] && grep -q '"foder"' pyproject.toml 2>/dev/null; then
   # Already inside the repo (local dev / CI)
   INSTALL_DIR="$PWD"
   info "Using local repository: $INSTALL_DIR"
-elif command -v git &>/dev/null; then
+else
   INSTALL_DIR="$HOME/.foder_src"
+
+  # Safety: never reuse/wipe a path outside the user's own home.
+  case "$INSTALL_DIR" in
+    "$HOME"/*) : ;;
+    *) err "Refusing to use install path '$INSTALL_DIR' (outside \$HOME)." ;;
+  esac
+
   if [ -d "$INSTALL_DIR/.git" ]; then
     info "Updating existing installation..."
-    git -C "$INSTALL_DIR" pull --rebase origin main 2>/dev/null || \
-    git -C "$INSTALL_DIR" pull origin main 2>/dev/null || \
-    info "Could not update — continuing with existing version"
+    # Update in place — idempotent, no user data is stored in this directory.
+    BRANCH="$(git -C "$INSTALL_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)"
+    [ -n "$BRANCH" ] && [ "$BRANCH" != "HEAD" ] || BRANCH="main"
+    git -C "$INSTALL_DIR" pull --rebase origin "$BRANCH" 2>/dev/null || \
+    git -C "$INSTALL_DIR" pull origin "$BRANCH" 2>/dev/null || \
+    warn "Could not update — continuing with the version already on disk"
   else
+    # Only clear a leftover directory if it looks like foder's own source tree.
+    if [ -e "$INSTALL_DIR" ] && [ ! -f "$INSTALL_DIR/pyproject.toml" ]; then
+      warn "'$INSTALL_DIR' exists and is not a foder checkout — leaving it alone"
+      INSTALL_DIR="$HOME/.foder_src"
+    elif [ -d "$INSTALL_DIR" ]; then
+      info "Refreshing incomplete checkout at $INSTALL_DIR"
+      rm -rf "$INSTALL_DIR"
+    fi
+
     info "Fetching foder from $FODER_REPO..."
-    rm -rf "$INSTALL_DIR"
-    git clone --depth=1 "$FODER_REPO" "$INSTALL_DIR"
+    if command -v git &>/dev/null && git clone --depth=1 "$FODER_REPO" "$INSTALL_DIR" 2>/dev/null; then
+      ok "Cloned $FODER_REPO"
+    else
+      # Fallback: source tarball from GitHub codeload (needs no git binary).
+      warn "git clone unavailable — falling back to the GitHub source archive"
+      TARBALL_URL="$FODER_REPO/archive/refs/heads/main.tar.gz"
+      TARBALL_TMP="$(mktemp -d)"
+      if command -v curl &>/dev/null; then
+        curl -fsSL "$TARBALL_URL" -o "$TARBALL_TMP/foder.tar.gz"
+      elif command -v wget &>/dev/null; then
+        wget -q "$TARBALL_URL" -O "$TARBALL_TMP/foder.tar.gz"
+      else
+        rm -rf "$TARBALL_TMP"
+        err "Neither git, curl nor wget is available. Install one of them and retry:
+  Ubuntu/Debian:  sudo apt install git curl
+  macOS:          brew install git
+  All platforms:  see $FODER_REPO"
+      fi
+      tar -xzf "$TARBALL_TMP/foder.tar.gz" -C "$TARBALL_TMP"
+      rm -f "$TARBALL_TMP/foder.tar.gz"
+      # The archive extracts to foder-main/ — normalise the layout to $INSTALL_DIR
+      SRC_DIR="$(find "$TARBALL_TMP" -maxdepth 1 -mindepth 1 -type d | head -n 1)"
+      if [ -z "$SRC_DIR" ] || [ ! -f "$SRC_DIR/pyproject.toml" ]; then
+        rm -rf "$TARBALL_TMP"
+        err "Downloaded archive from $TARBALL_URL does not contain a foder source tree."
+      fi
+      rm -rf "$INSTALL_DIR"
+      mkdir -p "$INSTALL_DIR"
+      cp -R "$SRC_DIR/." "$INSTALL_DIR/"
+      rm -rf "$TARBALL_TMP"
+      ok "Source archive downloaded and unpacked"
+      warn "Installed from a snapshot — run 'foder --update' after git is available"
+    fi
   fi
-else
-  err "git not found. Install git and retry.
-  Ubuntu/Debian:  sudo apt install git
-  macOS:          brew install git"
 fi
+
+[ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/pyproject.toml" ] || err "Could not obtain foder source."
 
 # ── Install foder ──────────────────────────────────────────────────────────────
 echo ""
@@ -129,22 +207,37 @@ info "Installing foder..."
 cd "$INSTALL_DIR"
 
 INSTALL_OK=false
+PIP_ERR_LOG="$(mktemp)"
+: > "$PIP_ERR_LOG"
 for flags in "--break-system-packages -q" "-q" "--user -q" "--user"; do
   # shellcheck disable=SC2086
-  if "$PYTHON" -m pip install -e . $flags 2>/dev/null; then
+  if "$PYTHON" -m pip install -e . $flags 2>>"$PIP_ERR_LOG"; then
     INSTALL_OK=true; break
   fi
+  echo "" >> "$PIP_ERR_LOG"
 done
 
-$INSTALL_OK || err "pip install failed. Try manually:
-  cd $INSTALL_DIR && pip install -e ."
+if [ "$INSTALL_OK" != "true" ]; then
+  warn "pip reported:"
+  sed -n '1,15p' "$PIP_ERR_LOG" | sed 's/^/      /'
+  rm -f "$PIP_ERR_LOG"
+  err "pip install failed. Try manually:
+  cd $INSTALL_DIR && pip install -e .
+Or, on Debian/Ubuntu with PEP 668:  pip install --user -e ."
+fi
+rm -f "$PIP_ERR_LOG"
 
 # ── Create ~/.foder directory structure ────────────────────────────────────────
+# Only creates missing directories — an existing ~/.foder/ is never touched,
+# so memories, preferences, sessions and history survive reinstalls/upgrades.
 FODER_DIR="$HOME/.foder"
+if [ -e "$FODER_DIR" ] && [ ! -d "$FODER_DIR" ]; then
+  err "'$FODER_DIR' exists but is not a directory. Move or remove it and retry."
+fi
 mkdir -p \
   "$FODER_DIR/skills" \
   "$FODER_DIR/sessions"
-ok "~/.foder/ directory ready"
+ok "$HOME/.foder/ directory ready"
 
 # ── Verify installation ─────────────────────────────────────────────────────────
 echo ""
@@ -171,10 +264,11 @@ if command -v ollama &>/dev/null; then
   if ! ollama list 2>/dev/null | grep -q "qwen2.5-coder"; then
     echo ""
     echo -e "  ${DIM}Recommended starter model: qwen2.5-coder:3b (~2GB)${RST}"
-    read -rp "  Pull it now? [Y/n] " REPLY; echo ""
-    if [[ "$REPLY" =~ ^[Yy]?$ ]]; then
+    if ask_yn "  Pull it now? [Y/n] " "y"; then
       info "Pulling qwen2.5-coder:3b..."
       ollama pull qwen2.5-coder:3b && ok "Model ready — this is your default coding model"
+    else
+      info "Skipped. Pull one later with:  ollama pull qwen2.5-coder:3b"
     fi
   else
     ok "qwen2.5-coder already available"

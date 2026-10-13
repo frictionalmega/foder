@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "foder"
-version = "0.2.0"
+version = "0.1.0"
 description = "Local AI coding agent — full developer ecosystem powered by Ollama"
 readme = "README.md"
 license = { text = "MIT" }
@@ -31,8 +31,9 @@ dependencies = [
 
 [project.urls]
 Homepage   = "https://foder.vercel.app"
-Repository = "https://github.com/Frictionalfor/foder"
-Issues     = "https://github.com/Frictionalfor/foder/issues"
+Repository = "https://github.com/frictionalmega/foder"
+Issues     = "https://github.com/frictionalmega/foder/issues"
+Changelog  = "https://github.com/frictionalmega/foder/blob/main/CHANGELOG.md"
 
 [project.scripts]
 foder = "foder.main:main"
@@ -49,4 +50,4 @@ include = ["foder*", "skills*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-python_functions = ["test", "t_*"]
+python_functions = ["test_*"]

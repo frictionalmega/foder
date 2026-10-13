@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Foder changelog hook — post-commit
+#
+# Regenerates the Unreleased block of CHANGELOG.md from the commit you just
+# made, so the changelog tracks the log without you typing anything.
+#
+# Set FODER_SKIP_CHANGELOG_HOOK=1 to skip for a single commit.
+#
+# It only ever amends the commit you just created, and only while that commit
+# has not been pushed anywhere — so no force-push is ever required.
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)" || exit 0
+
+[ "${FODER_SKIP_CHANGELOG_HOOK:-0}" = "1" ] && exit 0
+[ -f scripts/update_changelog.py ] || exit 0
+command -v python3 >/dev/null 2>&1 || exit 0
+
+# Never fight a merge or rebase that is mid-flight.
+[ -f .git/MERGE_HEAD ] && exit 0
+[ -d .git/rebase-merge ] && exit 0
+[ -d .git/rebase-apply ] && exit 0
+
+before=""
+[ -f CHANGELOG.md ] && before="$(cat CHANGELOG.md)"
+
+python3 scripts/update_changelog.py >/dev/null 2>&1 || {
+  echo "foder: changelog hook could not regenerate CHANGELOG.md (see scripts/update_changelog.py)" >&2
+  exit 0
+}
+
+after=""
+[ -f CHANGELOG.md ] && after="$(cat CHANGELOG.md)"
+[ "$before" = "$after" ] && exit 0
+
+# Is the current commit already published?
+published=0
+if git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' >/dev/null 2>&1; then
+  published="$(git rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 1)"
+fi
+
+if [ "$published" = "0" ]; then
+  git add CHANGELOG.md
+  if git commit --amend --no-edit --no-verify >/dev/null 2>&1; then
+    echo "foder: CHANGELOG.md updated and folded into commit $(git rev-parse --short HEAD)"
+  else
+    echo "foder: CHANGELOG.md changed — commit it:  git add CHANGELOG.md && git commit --amend --no-edit" >&2
+  fi
+else
+  echo "foder: CHANGELOG.md changed (commit already pushed, so it was not amended)." >&2
+  echo "foder: commit it separately:  git add CHANGELOG.md && git commit -m 'chore: update changelog'" >&2
+fi
+
+exit 0

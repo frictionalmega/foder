@@ -1,6 +1,12 @@
 """
 Configuration — all runtime settings for Foder.
-Priority: env var > foder.json > defaults.
+
+Effective resolution order:
+  environment variable  >  WORKSPACE/foder.json  >  built-in default
+
+Settings read at import time (WORKSPACE, the Ollama connection, and the agent
+limits) come from the environment first; `load_project_config()` then applies
+foder.json for anything the environment did not set.
 """
 
 import os
@@ -89,7 +95,8 @@ def load_project_config() -> None:
     Also auto-detects the best available Ollama model on first call.
     """
     global OLLAMA_MODEL, OLLAMA_BASE_URL, MAX_ITERATIONS
-    global SHELL_TIMEOUT, LLM_TIMEOUT, CUSTOM_INSTRUCTIONS, INDEXING_ENABLED
+    global SHELL_TIMEOUT, LLM_TIMEOUT, LLM_TEMPERATURE
+    global CUSTOM_INSTRUCTIONS, INDEXING_ENABLED
 
     # Auto-detect best available model if still at factory default
     if not os.environ.get("OLLAMA_MODEL"):
@@ -114,6 +121,8 @@ def load_project_config() -> None:
         SHELL_TIMEOUT = int(data.get("shell_timeout", SHELL_TIMEOUT))
     if not os.environ.get("FODER_LLM_TIMEOUT"):
         LLM_TIMEOUT = float(data.get("llm_timeout", LLM_TIMEOUT))
+    if not os.environ.get("FODER_LLM_TEMPERATURE"):
+        LLM_TEMPERATURE = float(data.get("llm_temperature", LLM_TEMPERATURE))
     if not os.environ.get("FODER_INSTRUCTIONS"):
         CUSTOM_INSTRUCTIONS = data.get("instructions", CUSTOM_INSTRUCTIONS)
     if not os.environ.get("FODER_INDEXING"):

@@ -1,10 +1,16 @@
 """
 Foder on-site test runner.
 Tests real agent tasks against Ollama.
-Workspace: ~/timepass  (created automatically if missing)
+Workspace: /tmp/foder_integration_test (created automatically if missing)
 
-Run with: python3 tests/test_integration.py
-Requires: ollama running with at least one model pulled.
+Run with:
+    python3 tests/test_integration.py
+Requires:
+    ollama running with at least one model pulled.
+
+NOTE: nothing in this module runs at import time. Importing it under pytest
+must not create directories, rewrite foder.config.WORKSPACE, or touch the
+network — all of that happens inside main() when the file is run directly.
 """
 import os
 import sys
@@ -13,16 +19,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
-# ── Workspace setup ────────────────────────────────────────────────────────────
-WORKSPACE = Path(os.environ.get("FODER_TEST_WORKSPACE", tempfile.gettempdir() + "/foder_integration_test"))
-WORKSPACE.mkdir(parents=True, exist_ok=True)
-
-# Set workspace before importing foder modules
 import foder.config as config
-config.WORKSPACE = WORKSPACE
-config.load_project_config()
 
-from foder.agent import run, _extract_tool_call   # noqa: E402
+from foder.agent import run  # noqa: E402
 
 PASS  = "\033[92mPASS\033[0m"
 FAIL  = "\033[91mFAIL\033[0m"
@@ -30,9 +29,52 @@ INFO  = "\033[94mINFO\033[0m"
 
 results: list[tuple[str, bool, str]] = []
 
+# Set by main() when this file is run directly — never at import time.
+WORKSPACE: Path | None = None
+
+
+def _setup_workspace() -> Path:
+    """Create the scratch workspace and point foder at it."""
+    global WORKSPACE
+    ws = Path(os.environ.get(
+        "FODER_TEST_WORKSPACE", tempfile.gettempdir() + "/foder_integration_test"
+    ))
+    ws.mkdir(parents=True, exist_ok=True)
+    config.WORKSPACE = ws
+    config.load_project_config()
+    WORKSPACE = ws
+    return ws
+
+
+def ollama_available() -> bool:
+    """True when the local Ollama API answers. No exceptions leak out."""
+    try:
+        import httpx
+        httpx.get(f"{config.OLLAMA_BASE_URL}/api/tags", timeout=2.0)
+        return True
+    except Exception:
+        return False
+
+
+def test_ollama_api_is_reachable() -> None:
+    """
+    Sanity check for the local LLM the agent depends on.
+
+    Skipped — not failed — when Ollama is not running, so `pytest tests/`
+    stays green on machines (and CI runners) without a local model.
+    """
+    if not ollama_available():
+        import pytest
+        pytest.skip(
+            f"Ollama is not reachable at {config.OLLAMA_BASE_URL} — "
+            "run `ollama serve` to execute the live integration suite."
+        )
+    assert ollama_available()
+
 
 def clean_workspace() -> None:
     """Remove all files from the test workspace between suites."""
+    assert WORKSPACE is not None, "clean_workspace() called before main()"
     for p in WORKSPACE.iterdir():
         try:
             if p.is_dir():
@@ -115,6 +157,8 @@ def task(
 
 
 def main() -> None:
+    _setup_workspace()
+
     print("\n" + "=" * 60)
     print("  FODER AGENT TEST SUITE")
     print(f"  workspace: {WORKSPACE}")
