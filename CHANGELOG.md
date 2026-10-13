@@ -6,20 +6,18 @@
 
 ### Added
 
+- Final release preparation - push all changes including CHANGELOG (733d2ee)
 - Auto-generate Unreleased block via scripts/update_changelog.py (79f0d93)
 - Auto-update CHANGELOG.md on commit via hook, improve error messages, fix update stash and release scripts (e126f85)
 
 ### Chores
 
-- Update CHANGELOG.md to repository state (c9d953d)
-- Update README.md with correct GitHub links and author information (368bc47)
-- Update CHANGELOG.md to repository state (a9517d6)
-- Update CHANGELOG.md to match repository (a0c0e78)
-- Auto-update CHANGELOG.md (83c985f)
-
-### Other
-
-- Revert README to match target branch (Frictionalfor/foder old identity) (c463ab6)
+- Update CHANGELOG.md to repository state (58df6fc)
+- Update CHANGELOG.md to repository state (17e991b)
+- Update README.md with correct GitHub links and author information (536eaaf)
+- Update CHANGELOG.md to repository state (28e4540)
+- Update CHANGELOG.md to match repository (af6741e)
+- Auto-update CHANGELOG.md (0c42545)
 
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
 <!-- auto:generated=2026-10-13 · regenerate: python3 scripts/update_changelog.py -->
