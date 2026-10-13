@@ -11,6 +11,7 @@
 
 ### Chores
 
+- Update README.md with correct GitHub links and author information (368bc47)
 - Update CHANGELOG.md to repository state (a9517d6)
 - Update CHANGELOG.md to match repository (a0c0e78)
 - Auto-update CHANGELOG.md (83c985f)
