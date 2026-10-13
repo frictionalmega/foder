@@ -32,6 +32,7 @@
 
 ### Other
 
+- Update installation scripts (5b2acae)
 - Merge pull request #1 from frictionalmega/update-author-info (35c723a)
 
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
