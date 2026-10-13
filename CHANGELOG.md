@@ -11,6 +11,7 @@
 
 ### Chores
 
+- Update CHANGELOG.md to match repository (a0c0e78)
 - Auto-update CHANGELOG.md (83c985f)
 
 ### Other
