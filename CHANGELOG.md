@@ -6,6 +6,7 @@
 
 ### Added
 
+- Final release preparation - push all changes including CHANGELOG (733d2ee)
 - Auto-generate Unreleased block via scripts/update_changelog.py (79f0d93)
 - Auto-update CHANGELOG.md on commit via hook, improve error messages, fix update stash and release scripts (e126f85)
 
