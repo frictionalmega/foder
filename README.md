@@ -16,8 +16,8 @@
 ```
 
 > **Website:** [foder.vercel.app](https://foder.vercel.app)
-> **GitHub:** [github.com/Frictionalfor/foder](https://github.com/Frictionalfor/foder)
-> Built by [Frictionalfor](https://github.com/Frictionalfor)
+> **GitHub:** [github.com/frictionalmega/foder](https://github.com/frictionalmega/foder)
+> Built by [Swanand Gajkeshwar](https://github.com/frictionalmega)
 
 ---
 
@@ -27,6 +27,7 @@ Foder is a terminal-based AI coding agent that runs 100% locally using [Ollama](
 It is the **OpenCode alternative that works completely offline** — no subscriptions, no API keys, no data leaving your machine.
 
 **Core capabilities:**
+
 - Interactive REPL coding agent
 - Project generation — full apps, SaaS clones, full-stack systems
 - 11 built-in skills — React, Next.js, FastAPI, Django, Node, mobile, auth, DB design, SaaS cloner, CLI tools
@@ -67,12 +68,13 @@ irm https://foder.vercel.app/install.ps1 | iex
 ### From source
 
 ```bash
-git clone https://github.com/Frictionalfor/foder.git
+git clone https://github.com/frictionalmega/foder.git
 cd foder
 bash install.sh
 ```
 
 The installer:
+
 - Detects your OS
 - Checks Python 3.10+ and Ollama
 - Installs foder and creates `~/.foder/`
@@ -108,6 +110,7 @@ foder > /build a React Native mobile app with Expo
 ```
 
 The agent will:
+
 1. Detect the right skill automatically
 2. Design the architecture
 3. Generate every file completely (no TODOs, no placeholders)
@@ -128,19 +131,19 @@ foder > /skills show next_app    # see steps and best practices
 foder > /skills use django_backend
 ```
 
-| Skill | Description |
-|---|---|
-| `react_app` | React + Vite + Tailwind + React Router |
-| `next_app` | Next.js 14 App Router + TypeScript + Tailwind |
-| `fastapi_backend` | FastAPI + SQLAlchemy + Pydantic + JWT |
-| `django_backend` | Django + DRF + PostgreSQL + JWT |
-| `node_api` | Express + SQLite + Zod + JWT |
-| `fullstack_app` | React frontend + FastAPI/Express backend |
-| `saas_cloner` | Clone Instagram, Twitter, Airbnb, etc. |
-| `mobile_app` | React Native + Expo Router |
-| `auth_system` | Add JWT auth to any existing project |
-| `database_schema` | Design and implement DB schemas |
-| `cli_tool` | Python or Node.js CLI with Rich/Commander |
+| Skill             | Description                                   |
+| ----------------- | --------------------------------------------- |
+| `react_app`       | React + Vite + Tailwind + React Router        |
+| `next_app`        | Next.js 14 App Router + TypeScript + Tailwind |
+| `fastapi_backend` | FastAPI + SQLAlchemy + Pydantic + JWT         |
+| `django_backend`  | Django + DRF + PostgreSQL + JWT               |
+| `node_api`        | Express + SQLite + Zod + JWT                  |
+| `fullstack_app`   | React frontend + FastAPI/Express backend      |
+| `saas_cloner`     | Clone Instagram, Twitter, Airbnb, etc.        |
+| `mobile_app`      | React Native + Expo Router                    |
+| `auth_system`     | Add JWT auth to any existing project          |
+| `database_schema` | Design and implement DB schemas               |
+| `cli_tool`        | Python or Node.js CLI with Rich/Commander     |
 
 Add custom skills to `~/.foder/skills/` or `./skills/` as JSON files.
 
@@ -182,42 +185,42 @@ foder > /pin src/auth.py          # pin a file to every prompt
 
 ## Slash Commands Reference
 
-| Command | Description |
-|---|---|
-| `/build <desc>` | generate a complete project end-to-end |
-| `/plan <request>` | build an implementation plan before executing |
-| `/auto <task>` | autonomous mode |
-| `/chat <question>` | lightweight Q&A, no tools |
-| `/test [path]` | auto-detect and run test suite |
-| `/refactor <file>` | targeted diff-based refactor |
-| `/watch [pattern]` | watch files, trigger agent on save |
-| `/review [path]` | code review a file or directory |
-| `/explain <file>` | explain code `[beginner\|advanced]` |
-| `/compress` | summarize and compress conversation history |
-| `/history [query]` | search persistent prompt history |
-| `/doctor` | system health check |
-| `/skills list` | list all available skills |
-| `/skills show <name>` | show skill steps and best practices |
-| `/skills use <name>` | load a skill explicitly |
-| `/models` | list available Ollama models |
-| `/switch [model]` | switch model mid-session |
-| `/model` | show active model info |
-| `/theme` | pick color theme (6 built-in) |
-| `/context` | show detected project type |
-| `/memory add <fact>` | remember a project fact |
-| `/memory show` | view all workspace memory |
-| `/index` | list workspace files ranked by relevance |
-| `/git` | git status, branch, recent commits |
-| `/pin <file>` | pin file to every prompt |
-| `/undo` | revert last file write |
-| `/diff` | show diff of last file write |
-| `/snapshot` | save workspace file state |
-| `/snapshot diff` | show what changed since snapshot |
-| `/cost` | session stats |
-| `/audit` | recent tool call log |
-| `/arch` | Foder architecture diagram |
-| `/clear` | clear screen and conversation history |
-| `/exit` | quit (unloads model from RAM) |
+| Command               | Description                                   |
+| --------------------- | --------------------------------------------- |
+| `/build <desc>`       | generate a complete project end-to-end        |
+| `/plan <request>`     | build an implementation plan before executing |
+| `/auto <task>`        | autonomous mode                               |
+| `/chat <question>`    | lightweight Q&A, no tools                     |
+| `/test [path]`        | auto-detect and run test suite                |
+| `/refactor <file>`    | targeted diff-based refactor                  |
+| `/watch [pattern]`    | watch files, trigger agent on save            |
+| `/review [path]`      | code review a file or directory               |
+| `/explain <file>`     | explain code `[beginner\|advanced]`           |
+| `/compress`           | summarize and compress conversation history   |
+| `/history [query]`    | search persistent prompt history              |
+| `/doctor`             | system health check                           |
+| `/skills list`        | list all available skills                     |
+| `/skills show <name>` | show skill steps and best practices           |
+| `/skills use <name>`  | load a skill explicitly                       |
+| `/models`             | list available Ollama models                  |
+| `/switch [model]`     | switch model mid-session                      |
+| `/model`              | show active model info                        |
+| `/theme`              | pick color theme (6 built-in)                 |
+| `/context`            | show detected project type                    |
+| `/memory add <fact>`  | remember a project fact                       |
+| `/memory show`        | view all workspace memory                     |
+| `/index`              | list workspace files ranked by relevance      |
+| `/git`                | git status, branch, recent commits            |
+| `/pin <file>`         | pin file to every prompt                      |
+| `/undo`               | revert last file write                        |
+| `/diff`               | show diff of last file write                  |
+| `/snapshot`           | save workspace file state                     |
+| `/snapshot diff`      | show what changed since snapshot              |
+| `/cost`               | session stats                                 |
+| `/audit`              | recent tool call log                          |
+| `/arch`               | Foder architecture diagram                    |
+| `/clear`              | clear screen and conversation history         |
+| `/exit`               | quit (unloads model from RAM)                 |
 
 ---
 
@@ -228,6 +231,7 @@ foder init
 ```
 
 Interactive wizard that creates `foder.json` in your project:
+
 - Selects a model from available Ollama models
 - Sets project instructions (tech stack, conventions)
 - Sets max agent iterations
@@ -260,19 +264,19 @@ foder > !!          # re-run last shell command
 
 The agent has access to 11 tools:
 
-| Tool | Description |
-|---|---|
-| `file_read` | read a file |
-| `file_write` | write / create a file |
-| `file_edit` | patch-based editing (replaces a specific string) |
-| `file_delete` | delete a file |
-| `file_rename` | rename or move a file |
-| `dir_list` | list directory contents |
-| `dir_create` | create a directory |
-| `dir_remove` | remove a directory |
-| `shell_exec` | run a shell command (sandboxed) |
-| `grep_search` | search for patterns across files |
-| `git_tool` | git status, diff, log, add, commit, checkout |
+| Tool          | Description                                      |
+| ------------- | ------------------------------------------------ |
+| `file_read`   | read a file                                      |
+| `file_write`  | write / create a file                            |
+| `file_edit`   | patch-based editing (replaces a specific string) |
+| `file_delete` | delete a file                                    |
+| `file_rename` | rename or move a file                            |
+| `dir_list`    | list directory contents                          |
+| `dir_create`  | create a directory                               |
+| `dir_remove`  | remove a directory                               |
+| `shell_exec`  | run a shell command (sandboxed)                  |
+| `grep_search` | search for patterns across files                 |
+| `git_tool`    | git status, diff, log, add, commit, checkout     |
 
 ---
 
@@ -280,11 +284,11 @@ The agent has access to 11 tools:
 
 Three memory layers:
 
-| Layer | Storage | Contains |
-|---|---|---|
-| Session | RAM | Current conversation |
-| Workspace | `.foder/memory.json` | Project facts, architecture notes, decisions |
-| User | `~/.foder/preferences.json` | Model, theme, coding style |
+| Layer     | Storage                     | Contains                                     |
+| --------- | --------------------------- | -------------------------------------------- |
+| Session   | RAM                         | Current conversation                         |
+| Workspace | `.foder/memory.json`        | Project facts, architecture notes, decisions |
+| User      | `~/.foder/preferences.json` | Model, theme, coding style                   |
 
 ```
 foder > /memory add this project uses PostgreSQL, not SQLite
@@ -300,11 +304,11 @@ Drop a `foder.json` in your project root (or run `foder init`):
 
 ```json
 {
-  "model": "qwen2.5-coder:7b",
-  "instructions": "This is a Python 3.12 project using FastAPI and PostgreSQL.",
-  "max_iterations": 15,
-  "llm_timeout": 300,
-  "shell_timeout": 60
+    "model": "qwen2.5-coder:7b",
+    "instructions": "This is a Python 3.12 project using FastAPI and PostgreSQL.",
+    "max_iterations": 15,
+    "llm_timeout": 300,
+    "shell_timeout": 60
 }
 ```
 
@@ -312,15 +316,15 @@ Drop a `foder.json` in your project root (or run `foder init`):
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `OLLAMA_MODEL` | auto-detected | model to use |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
-| `FODER_WORKSPACE` | current directory | workspace root |
-| `FODER_MAX_ITER` | `20` | max agent loop iterations |
-| `FODER_LLM_TIMEOUT` | `600` | LLM request timeout (seconds) |
-| `FODER_SHELL_TIMEOUT` | `30` | shell command timeout (seconds) |
-| `FODER_INSTRUCTIONS` | _(empty)_ | custom instructions appended to system prompt |
+| Variable              | Default                  | Description                                   |
+| --------------------- | ------------------------ | --------------------------------------------- |
+| `OLLAMA_MODEL`        | auto-detected            | model to use                                  |
+| `OLLAMA_BASE_URL`     | `http://localhost:11434` | Ollama endpoint                               |
+| `FODER_WORKSPACE`     | current directory        | workspace root                                |
+| `FODER_MAX_ITER`      | `20`                     | max agent loop iterations                     |
+| `FODER_LLM_TIMEOUT`   | `600`                    | LLM request timeout (seconds)                 |
+| `FODER_SHELL_TIMEOUT` | `30`                     | shell command timeout (seconds)               |
+| `FODER_INSTRUCTIONS`  | _(empty)_                | custom instructions appended to system prompt |
 
 ---
 
@@ -347,13 +351,13 @@ Checks Python version, pip, PATH, `~/.foder/` structure, Ollama running status, 
 
 ## Recommended Models
 
-| Model | RAM | Best For |
-|---|---|---|
-| `qwen2.5-coder:3b` | ~2GB | fast, everyday coding |
-| `qwen2.5-coder:7b` | ~4GB | better quality |
-| `qwen2.5-coder:14b` | ~8GB | complex tasks |
-| `qwen3.5:9b` | ~6GB | balanced reasoning + coding |
-| `deepseek-coder:6.7b` | ~4GB | code generation |
+| Model                 | RAM  | Best For                    |
+| --------------------- | ---- | --------------------------- |
+| `qwen2.5-coder:3b`    | ~2GB | fast, everyday coding       |
+| `qwen2.5-coder:7b`    | ~4GB | better quality              |
+| `qwen2.5-coder:14b`   | ~8GB | complex tasks               |
+| `qwen3.5:9b`          | ~6GB | balanced reasoning + coding |
+| `deepseek-coder:6.7b` | ~4GB | code generation             |
 
 Foder auto-detects which model you have installed — no manual config needed.
 
@@ -456,7 +460,7 @@ python3 tests/test_integration.py
 
 ## Continuous Integration
 
-[![Tests](https://github.com/Frictionalfor/foder/actions/workflows/tests.yml/badge.svg)](https://github.com/Frictionalfor/foder/actions)
+[![Tests](https://github.com/frictionalmega/foder/actions/workflows/tests.yml/badge.svg)](https://github.com/frictionalmega/foder/actions)
 
 Every push runs the unit test suite on Python 3.11 and 3.13.
 
@@ -468,10 +472,10 @@ MIT — see [LICENSE](LICENSE)
 
 ## Links
 
-| | |
-|---|---|
-| Website | [foder.vercel.app](https://foder.vercel.app) |
-| GitHub | [github.com/Frictionalfor/foder](https://github.com/Frictionalfor/foder) |
-| Install | [foder.vercel.app/install.sh](https://foder.vercel.app/install.sh) |
-| Issues | [github.com/Frictionalfor/foder/issues](https://github.com/Frictionalfor/foder/issues) |
-| Author | [github.com/Frictionalfor](https://github.com/Frictionalfor) |
+|         |                                                                                          |
+| ------- | ---------------------------------------------------------------------------------------- |
+| Website | [foder.vercel.app](https://foder.vercel.app)                                             |
+| GitHub  | [github.com/Frictionalfor/foder](https://github.com/frictionalmega/foder)                |
+| Install | [foder.vercel.app/install.sh](https://foder.vercel.app/install.sh)                       |
+| Issues  | [github.com/frictionalmega/foder/issues](https://github.com/frictionalmega/foder/issues) |
+| Author  | [Swanand Gajkeshwar](https://github.com/frictionalmega)                                  |
