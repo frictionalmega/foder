@@ -1,15 +1,17 @@
 # Foder — Changelog
+
 <!-- CHANGELOG-AUTO:BEGIN -->
 
 ## Unreleased
 
-_No changes recorded yet._
+### Added
+
+- Auto-update CHANGELOG.md on commit via hook, improve error messages, fix update stash and release scripts (e126f85)
 
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
 <!-- auto:generated=2026-10-13 · regenerate: python3 scripts/update_changelog.py -->
 
 <!-- CHANGELOG-AUTO:END -->
-
 
 All changes tracked by version. Most recent first.
 
