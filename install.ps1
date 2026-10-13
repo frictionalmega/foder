@@ -142,7 +142,7 @@ if (-not (Test-Path (Join-Path $installDir "pyproject.toml"))) {
             New-Item -ItemType Directory -Force -Path $tmp | Out-Null
             try {
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                Invoke-WebRequest -Uri $zipUrl -OutFile (Join-Path $tmp "foder.zip") -UseBasicParsing
+                Invoke-WebRequest -Uri $zipUrl -OutFile (Join-Path $tmp "foder.zip") -UseBasicParsing -TimeoutSec 120
                 if (Test-Path $installDir) { Remove-Item -Recurse -Force $installDir }
                 Expand-Archive -Path (Join-Path $tmp "foder.zip") -DestinationPath $tmp -Force
                 $extracted = Get-ChildItem -Path $tmp -Directory | Select-Object -First 1
