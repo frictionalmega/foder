@@ -11,19 +11,13 @@
 - Auto-generate Unreleased block via scripts/update_changelog.py (79f0d93)
 - Auto-update CHANGELOG.md on commit via hook, improve error messages, fix update stash and release scripts (e126f85)
 
-### Fixed
-
-- Increase timeout for download in installation script (a022614)
-- Update fallback download method to use ZIP archive for installation (2c99a01)
-- Update fallback download method to use ZIP archive for installation (060e70a)
-
 ### Documentation
 
 - Update author and repository references to frictionalmega (3f6606e)
 
 ### Chores
 
-- Update changelog (ddd1d12)
+- Update changelog with installation script fixes and author updates (1165692)
 - Update CHANGELOG.md to repository state (58df6fc)
 - Update CHANGELOG.md to repository state (17e991b)
 - Update README.md with correct GitHub links and author information (536eaaf)
@@ -33,6 +27,7 @@
 
 ### Other
 
+- Update installation scripts (5b2acae)
 - Merge pull request #1 from frictionalmega/update-author-info (35c723a)
 
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
