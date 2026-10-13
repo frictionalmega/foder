@@ -24,6 +24,10 @@
 - Update CHANGELOG.md to match repository (af6741e)
 - Auto-update CHANGELOG.md (0c42545)
 
+### Other
+
+- Merge pull request #1 from frictionalmega/update-author-info (35c723a)
+
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
 <!-- auto:generated=2026-10-13 · regenerate: python3 scripts/update_changelog.py -->
 
