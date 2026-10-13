@@ -104,10 +104,10 @@ if (-not (Test-Path (Join-Path $installDir "pyproject.toml"))) {
     if (Test-Path "$installDir\.git") {
         Write-Info "Updating existing installation..."
         try {
-            $branch = (& git -C $installDir rev-parse --abbrev-ref HEAD 2>$null | Select-Object -First 1)
+            $branch = (& git -C "$installDir" rev-parse --abbrev-ref HEAD 2>$null | Select-Object -First 1)
             if (-not $branch -or $branch -eq "HEAD") { $branch = "main" }
-            & git -C $installDir pull --rebase origin $branch 2>$null
-            if ($LASTEXITCODE -ne 0) { & git -C $installDir pull origin $branch 2>$null }
+            & git -C "$installDir" pull --rebase origin $branch 2>$null
+            if ($LASTEXITCODE -ne 0) { & git -C "$installDir" pull origin $branch 2>$null }
             if ($LASTEXITCODE -ne 0) {
                 Write-Info "Could not update - continuing with the version already on disk"
             }
@@ -128,7 +128,7 @@ if (-not (Test-Path (Join-Path $installDir "pyproject.toml"))) {
         if (Get-Command git -ErrorAction SilentlyContinue) {
             Write-Info "Fetching foder from GitHub..."
             try {
-                & git clone --depth=1 $FODER_REPO $installDir 2>$null
+                & git clone --depth=1 "$FODER_REPO" "$installDir"
                 $cloned = ($LASTEXITCODE -eq 0)
             } catch { $cloned = $false }
         }
