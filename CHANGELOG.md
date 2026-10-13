@@ -11,6 +11,7 @@
 
 ### Chores
 
+- Update CHANGELOG.md to repository state (c9d953d)
 - Update README.md with correct GitHub links and author information (368bc47)
 - Update CHANGELOG.md to repository state (a9517d6)
 - Update CHANGELOG.md to match repository (a0c0e78)
