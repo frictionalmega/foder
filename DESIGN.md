@@ -511,7 +511,7 @@ foder/
 │   ├── auth_system.json
 │   ├── database_schema.json
 │   └── cli_tool.json
-├── foder-website/           separate git repo -> github.com/Frictionalfor/foder-website
+├── foder-website/           separate git repo -> github.com/frictionalmega/foder-website
 ├── install.sh               Linux/macOS installer (official: foder.vercel.app/install.sh)
 ├── install.ps1              Windows installer (official: foder.vercel.app/install.ps1)
 ├── run_tests.py             live agent tests (requires Ollama)
@@ -528,7 +528,7 @@ foder/
 
 ## 12. Website Architecture
 
-**Repo:** `github.com/Frictionalfor/foder-website`
+**Repo:** `github.com/frictionalmega/foder-website`
 **Deployed:** `foder.vercel.app`
 **Stack:** React 18 + Vite + Tailwind CSS + Framer Motion
 
@@ -554,7 +554,7 @@ foder/
 ### Install Source Rule
 
 **Install:** `https://foder.vercel.app/install.sh` (and `.ps1`)
-**Update:** `https://github.com/Frictionalfor/foder` (git pull)
+**Update:** `https://github.com/frictionalmega/foder` (git pull)
 
 These are the ONLY official sources. No mirrors. No GitHub raw links for install.
 
@@ -580,7 +580,7 @@ ThemeContext provides `theme` and `setTheme` to all components.
 curl -fsSL https://foder.vercel.app/install.sh | bash
 
 # From source
-git clone https://github.com/Frictionalfor/foder
+git clone https://github.com/frictionalmega/foder
 cd foder
 pip install -e .
 ```

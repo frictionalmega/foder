@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![Ollama](https://img.shields.io/badge/Ollama-Powered-green)](https://ollama.com)
-[![Tests](https://img.shields.io/badge/Tests-51%20passing-brightgreen)](https://github.com/Frictionalfor/foder/actions)
+[![Tests](https://img.shields.io/badge/Tests-51%20passing-brightgreen)](https://github.com/frictionalmega/foder/actions)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey)](/LICENSE)
 
 **Local AI Coding Agent — powered entirely by Ollama. No cloud. No API keys. Just code.**
@@ -475,7 +475,7 @@ MIT — see [LICENSE](LICENSE)
 |         |                                                                                          |
 | ------- | ---------------------------------------------------------------------------------------- |
 | Website | [foder.vercel.app](https://foder.vercel.app)                                             |
-| GitHub  | [github.com/Frictionalfor/foder](https://github.com/frictionalmega/foder)                |
+| GitHub  | [github.com/frictionalmega/foder](https://github.com/frictionalmega/foder)                |
 | Install | [foder.vercel.app/install.sh](https://foder.vercel.app/install.sh)                       |
 | Issues  | [github.com/frictionalmega/foder/issues](https://github.com/frictionalmega/foder/issues) |
 | Author  | [Swanand Gajkeshwar](https://github.com/frictionalmega)                                  |
