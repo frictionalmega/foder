@@ -13,9 +13,9 @@
 
 ### Fixed
 
- - Increase timeout for download in installation script (a022614)
- - Update fallback download method to use ZIP archive for installation (2c99a01)
- - Update fallback download method to use ZIP archive for installation (060e70a)
+- Correct CHANGELOG.md with installation script fixes and remove obsolete entries (5950ec0)
+- Correct Fixed section in CHANGELOG.md with installation script fixes and remove obsolete entries (8064795)
+- Add Fixed section to CHANGELOG.md and remove obsolete entries (3387d70)
 
 ### Documentation
 
@@ -23,6 +23,7 @@
 
 ### Chores
 
+- Update changelog with installation script fixes and author updates (1165692)
 - Update CHANGELOG.md to repository state (58df6fc)
 - Update CHANGELOG.md to repository state (17e991b)
 - Update README.md with correct GitHub links and author information (536eaaf)
@@ -32,6 +33,7 @@
 
 ### Other
 
+- Update installation scripts (5b2acae)
 - Merge pull request #1 from frictionalmega/update-author-info (35c723a)
 
 <!-- auto:base=0026d47eafdb5a910fd2a12e11ea052f43ad3826 -->
