@@ -80,11 +80,24 @@ def _is_ancestor(sha: str, ref: str = "HEAD") -> bool:
     return out.returncode == 0
 
 
+def _sha_exists(sha: str) -> bool:
+    """Return True if the SHA is reachable in the repository (handles post-amend orphans)."""
+    out = subprocess.run(["git", "cat-file", "-e", sha],
+                         cwd=str(REPO_ROOT), capture_output=True, timeout=120)
+    return out.returncode == 0
+
+
 def read_base(text: str) -> str | None:
     m = BASE_RE.search(text)
     if not m or m.group(1) == "none":
         return None
     sha = m.group(1)
+    # If the SHA no longer exists (e.g. was rewritten by a local --amend),
+    # fall back to HEAD's parent so we only pick up the most recent commit
+    # rather than dumping the entire history into Unreleased.
+    if not _sha_exists(sha):
+        parent = _git(["rev-parse", "HEAD~1"]).strip()
+        return parent if parent else None
     return sha if _is_ancestor(sha) else None
 
 

@@ -134,16 +134,17 @@ if (-not (Test-Path (Join-Path $installDir "pyproject.toml"))) {
         }
 
         if (-not $cloned) {
-            # Fallback: source archive from GitHub codeload (needs no git binary).
+            # Fallback: source ZIP archive from GitHub (Expand-Archive only supports .zip,
+            # NOT .tar.gz — use the zip endpoint instead).
             Write-Warn "git clone unavailable - falling back to the GitHub source archive"
-            $tarballUrl = "$FODER_REPO/archive/refs/heads/main.tar.gz"
+            $zipUrl = "$FODER_REPO/archive/refs/heads/main.zip"
             $tmp = Join-Path $env:TEMP "foder_src_$([Guid]::NewGuid().ToString('N'))"
             New-Item -ItemType Directory -Force -Path $tmp | Out-Null
             try {
                 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                Invoke-WebRequest -Uri $tarballUrl -OutFile (Join-Path $tmp "foder.tar.gz") -UseBasicParsing
+                Invoke-WebRequest -Uri $zipUrl -OutFile (Join-Path $tmp "foder.zip") -UseBasicParsing
                 if (Test-Path $installDir) { Remove-Item -Recurse -Force $installDir }
-                Expand-Archive -Path (Join-Path $tmp "foder.tar.gz") -DestinationPath $tmp -Force
+                Expand-Archive -Path (Join-Path $tmp "foder.zip") -DestinationPath $tmp -Force
                 $extracted = Get-ChildItem -Path $tmp -Directory | Select-Object -First 1
                 if (-not $extracted -or -not (Test-Path (Join-Path $extracted.FullName "pyproject.toml"))) {
                     throw "Downloaded archive does not contain a foder source tree."
@@ -153,7 +154,7 @@ if (-not (Test-Path (Join-Path $installDir "pyproject.toml"))) {
                 Write-OK "Source archive downloaded and unpacked"
                 Write-Warn "Installed from a snapshot - run 'foder --update' once git is available"
             } catch {
-                Write-Err "Could not download foder from $tarballUrl.`n  Install Git for Windows and retry: https://git-scm.com"
+                Write-Err "Could not download foder from $zipUrl.`n  Install Git for Windows and retry: https://git-scm.com"
             } finally {
                 Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
             }
@@ -168,7 +169,7 @@ Write-Host ""
 Write-Info "Installing foder..."
 
 $installed = $false
-foreach ($flags in @("--break-system-packages -q", "-q", "--user -q", "--user")) {
+foreach ($flags in @("-q", "--user -q", "--user", "--break-system-packages -q")) {
     try {
         & $Python -m pip install -e . $flags.Split(' ') 2>$null
         if ($LASTEXITCODE -eq 0) { $installed = $true; break }
@@ -209,7 +210,7 @@ if (Get-Command foder -ErrorAction SilentlyContinue) {
         if (Test-Path "$dir\foder.exe") {
             Write-OK "foder installed to: $dir"
             Write-Warn "Add to PATH. Run in PowerShell (Admin):"
-            Write-Host "  [Environment]::SetEnvironmentVariable('PATH', `$env:PATH+';$dir', 'User')" -ForegroundColor Cyan
+            Write-Host "  [Environment]::SetEnvironmentVariable('PATH', [Environment]::GetEnvironmentVariable('PATH','User')+';$dir', 'User')" -ForegroundColor Cyan
             $found = $true; break
         }
     }
