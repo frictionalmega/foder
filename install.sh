@@ -48,11 +48,14 @@ echo ""
 # When the script is piped on stdin, `read` would swallow the rest of the
 # script instead of waiting for the user. Re-attach stdin to the terminal.
 PROMPTS_OFF=0
-if [ ! -t 0 ] && [ -w /dev/tty ]; then
-  if exec < /dev/tty 2>/dev/null; then :; else PROMPTS_OFF=1; fi
-fi
-if [ ! -t 0 ] || [ ! -r /dev/tty ]; then
-  PROMPTS_OFF=1
+if [ ! -t 0 ]; then
+  # stdin is a pipe (curl | bash). Try to reattach to the terminal so
+  # read-based prompts work. If /dev/tty is unavailable, disable prompts.
+  if [ -r /dev/tty ] && [ -w /dev/tty ]; then
+    exec < /dev/tty 2>/dev/null || PROMPTS_OFF=1
+  else
+    PROMPTS_OFF=1
+  fi
 fi
 
 ask_yn() {
@@ -162,7 +165,7 @@ else
     fi
 
     info "Fetching foder from $FODER_REPO..."
-    if command -v git &>/dev/null && git clone --depth=1 "$FODER_REPO" "$INSTALL_DIR" 2>/dev/null; then
+    if command -v git &>/dev/null && git clone --depth=1 "$FODER_REPO" "$INSTALL_DIR"; then
       ok "Cloned $FODER_REPO"
     else
       # Fallback: source tarball from GitHub codeload (needs no git binary).
@@ -209,7 +212,7 @@ cd "$INSTALL_DIR"
 INSTALL_OK=false
 PIP_ERR_LOG="$(mktemp)"
 : > "$PIP_ERR_LOG"
-for flags in "--break-system-packages -q" "-q" "--user -q" "--user"; do
+for flags in "-q" "--user -q" "--user" "--break-system-packages -q"; do
   # shellcheck disable=SC2086
   if "$PYTHON" -m pip install -e . $flags 2>>"$PIP_ERR_LOG"; then
     INSTALL_OK=true; break

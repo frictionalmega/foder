@@ -13,8 +13,9 @@
 
 ### Fixed
 
-- Correct Fixed section in CHANGELOG.md with installation script fixes and remove obsolete entries (8064795)
-- Add Fixed section to CHANGELOG.md and remove obsolete entries (3387d70)
+ - Increase timeout for download in installation script (a022614)
+ - Update fallback download method to use ZIP archive for installation (2c99a01)
+ - Update fallback download method to use ZIP archive for installation (060e70a)
 
 ### Documentation
 
@@ -22,7 +23,6 @@
 
 ### Chores
 
-- Update changelog with installation script fixes and author updates (1165692)
 - Update CHANGELOG.md to repository state (58df6fc)
 - Update CHANGELOG.md to repository state (17e991b)
 - Update README.md with correct GitHub links and author information (536eaaf)
